@@ -58,6 +58,9 @@ SOFTWARE.
 #define CONSUMPTION_CAPACITY 0.1 // i.e. 0.1 means 10 times slower than production
 #define CONSUMPTION_RPS_SLEEP_MS int(PRODUCTION_RPS_SLEEP_MS/CONSUMPTION_CAPACITY) // delay to simulate consumption rate
 
+// Congestion algorithm: simple context ignore when busy consumers are detected and queue size grows over:
+#define MAX_QUEUE_SIZE 0 // with congestion control enabled, we allow only MAX_QUEUE_SIZE enqueued tasks before discard
+
 const char* progname;
 std::atomic<int> sequence;
 
@@ -81,17 +84,29 @@ public:
     Stream(const std::string &data, bool congestionControl) : data_(data), congestion_control_(congestionControl) {;}
 
     // Process reception
-    void process(bool congestion, int queueSize) {
-        std::string ifcongestion = (congestion ? "":"");
-        std::cout << "[process] Congestion detected: " << (congestion ? "true":"false") << " | Congestion control: " << (congestion_control_ ? "true":"false") << " | Queue size: " << queueSize << std::endl;
-        if (congestion && congestion_control_) {
+    void process(bool busyConsumers, int queueSize) {
+        std::cout << "[process] Congestion control: " << (congestion_control_ ? "true":"false") << " | Consumers are busy: " << (busyConsumers ? "true":"false") << " | Queue size: " << queueSize << std::endl;
+
+        if (congestion_control_ && busyConsumers && queueSize > MAX_QUEUE_SIZE) {
             std::cout << "[process] --- Ignore context for " << data_ << std::endl;
         }
         else {
-            std::cout << "[process] --- Data processed: " << data_ << (congestion ? " | Queue will grow as no congestion control is enabled":"") << std::endl;
+            std::cout << "[process] --- Data processed: " << data_;
+            if (congestion_control_) {
+                if (busyConsumers)
+                    std::cout << " | Queue size limit to apply congestion control: " << MAX_QUEUE_SIZE;
+            }
+            else {
+                std::cout << (busyConsumers ? " | Queue will grow as no congestion control is enabled":"");
+            }
+            std::cout << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(CONSUMPTION_RPS_SLEEP_MS));
         }
     };
+
+    //void processLapse(unsigned long long nanoseconds) {
+    //    std::cout << "[processLapse] Last process duration: " << nanoseconds << " ns" << std::endl;
+    //}
 };
 
 int main(int argc, char* argv[]) {

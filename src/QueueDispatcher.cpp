@@ -37,6 +37,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <chrono>
+
 #include <ert/tracing/Logger.hpp>
 
 #include <ert/queuedispatcher/QueueDispatcher.hpp>
@@ -115,9 +117,16 @@ void QueueDispatcher::dispatch_thread_handler(void)
             //unlock now that we're done messing with the queue
             lock.unlock();
 
-            // Congestion and no margin to grow consumers:
-            bool congestion = (busy_threads_.load() == threads_.size() && threads_.size() == max_threads_);
-            st->process(congestion, q_.size());
+            // No idle consumers, and no margin to create new consumer threads:
+            bool busyConsumers = (busy_threads_.load() == threads_.size() && threads_.size() == max_threads_);
+
+            auto begin = std::chrono::steady_clock::now();
+            st->process(busyConsumers, q_.size());
+            auto end = std::chrono::steady_clock::now();
+
+            // Stream could store statistics and take it together with busyConsumers and queue size to implement
+            // congestion control algorithms
+            st->processLapse(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
 
             lock.lock();
             busy_threads_--;

@@ -59,12 +59,19 @@ public:
     StreamIf& operator=(const StreamIf&) = delete;
 
     /**
-     * consumer gets job from queue.
+     * Consumer gets job from queue.
      *
-     * @param congestion Indicates congestion situation (simple congestion control may be context ignore)
+     * @param busyConsumers Indicates potential congestion situation (simple congestion control may be context ignore)
      * @param queueSize Indicates queue size (useful to improve congestion control algorithms when congestion is detected)
      */
-    virtual void process(bool congestion, int queueSize) = 0;
+    virtual void process(bool busyConsumers, int queueSize) = 0;
+
+    /**
+     * Queue control indicates the last process duration
+     *
+     * @param nanoseconds
+     */
+    virtual void processLapse(unsigned long long nanoseconds) {;}
 };
 
 }
