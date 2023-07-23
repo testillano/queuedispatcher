@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
 
     while(true) {
         std::cout << std::endl;
-        std::cout << "[iteration " << sequence.load() << "] Consumers threads: " << queue.threads() << " | Consumers max threads: " << queue.maxThreads() << " | Busy threads: " << queue.busyThreads() << std::endl;
+        std::cout << "[iteration " << sequence.load() << "] Consumers threads: " << queue.getThreads() << " | Consumers max threads: " << queue.getMaxThreads() << " | Busy threads: " << queue.getBusyThreads() << std::endl;
 
         auto stream = std::make_shared<Stream>(std::to_string(sequence.load()), congestionControl);
         sequence++;

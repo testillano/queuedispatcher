@@ -91,22 +91,22 @@ public:
     QueueDispatcher& operator=(QueueDispatcher&& rhs) = delete;
 
     /** Maximum threads reachable */
-    int maxThreads() const {
+    int getMaxThreads() const {
         return max_threads_;
     }
 
     /** Number of busy threads */
-    int busyThreads() const {
+    int getBusyThreads() const {
         return busy_threads_.load();
     }
 
     /** Current available threads */
-    int threads() const {
+    int getThreads() const {
         return threads_.size();
     }
 
     /** Queue size */
-    int size() const {
+    int getSize() const {
         return q_.size();
     }
 
