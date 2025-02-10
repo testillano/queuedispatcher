@@ -5,6 +5,7 @@
 [![Ask Me Anything !](https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg)](https://github.com/testillano)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/testillano/queuedispatcher/graphs/commit-activity)
 [![Main project workflow](https://github.com/testillano/queuedispatcher/actions/workflows/ci.yml/badge.svg)](https://github.com/testillano/queuedispatcher/actions/workflows/ci.yml)
+[![Docker Pulls](https://img.shields.io/docker/pulls/testillano/queuedispatcher.svg)](https://github.com/testillano/queuedispatcher/pkgs/container/queuedispatcher)
 
 This library is based on @jupp0r prometheus-cpp library (https://github.com/jupp0r/prometheus-cpp).
 It offers a quick way to instantiate an object to ease queuedispatcher creation and management from every program module.
